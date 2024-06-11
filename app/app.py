@@ -27,7 +27,7 @@ def create_app():
                 filename = secure_filename(file.filename)
                 
                 # Store imported file locally
-                new_filename = f'{filename.split(".")[0]}_{str(datetime.now())}.csv'
+                new_filename = 'input.csv'
                 save_location = os.path.join('input', new_filename)
                 file.save(save_location)
                 
@@ -39,7 +39,7 @@ def create_app():
 
                 # Run scorer to get submission file for competition
                 submission = scorer.make_pred(preprocessed_df, save_location)
-                submission.to_csv(save_location.replace('input', 'output'), index=False)
+                submission.to_csv("output/{}.csv".format(str(datetime.now())), index=False)
 
                 return redirect(url_for('download'))
 

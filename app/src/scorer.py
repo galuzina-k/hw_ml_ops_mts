@@ -1,23 +1,30 @@
-import pandas as pd
+import joblib
 
-# Import libs to solve classification task
-from catboost import CatBoostClassifier
+import pandas as pd
+from xgboost import XGBClassifier
+
+from sklearn.preprocessing import StandardScaler, OrdinalEncoder
+from sklearn.impute import SimpleImputer
+from sklearn.compose import ColumnTransformer
+from sklearn.pipeline import Pipeline
 
 # Make prediction
-def make_pred(dt, path_to_file):
+def make_pred(df, path_to_file):
 
     print('Importing pretrained model...')
-    # Import model
-    model = CatBoostClassifier()
-    model.load_model('./models/my_catboost_model.cbm')
+    # Load the saved model
+    model = joblib.load('models/xgboost_pipeline.pkl')
+
+    # Make predictions
+    predictions = model.predict_proba(df)
 
     # Define optimal threshold
-    model_th = 0.68
+    model_th = 0.6
 
     # Make submission dataframe
     submission = pd.DataFrame({
         'client_id':  pd.read_csv(path_to_file)['client_id'],
-        'preds': (model.predict_proba(dt)[:, 1] > model_th) * 1
+        'preds': (predictions[:, 1] > model_th) * 1
     })
     print('Prediction complete!')
 
